@@ -1,176 +1,209 @@
-# Simple-Blockchain-Client (가제) v1
+# Simple-Blockchain-Client v1
 
-## ▶️ 발표 동영상
-[Youtube](https://www.youtube.com/watch?v=h-vbAZ6Hku4)
+한국어 버전 : [Korean README](README.ko.md)
 
+## ▶️ Demo & Presentation Video (Please watch it first.)
 
-## 📖 프로젝트 개요
-이 프로젝트는 이더리움 기반으로 간단한 블록체인 클라이언트를 처음부터 구현했습니다.  
-<u>**로컬환경에서 P2P 통신부터 트랜잭션과 블록의 검증, 전파, 저장, 실행**</u>을 포함합니다.  
-
-## 📖 프로젝트 목적
-- **Go 언어 학습**  
-  고루틴과 채널 등 Go의 다양한 기능을 프로젝트에 활용하며, 언어의 깊은 학습을 하고자 합니다.
-
-- **블록체인 코어 기술에 대한 심층 이해**  
-  블록체인 핵심 기술을 직접 구현하면서, 이론적으로 알던 개념들을 코드로 구체화하며 각 기술의 중요성, 필요성을 느끼고자 합니다.  
-  예를 들어, 저는 데이터를 JSON으로 직렬화 했습니다. 그러나 구현 과정에서 타입의 명확성 부족, 비효율적인 크기를 경험하며 RLP의 효율성을 체감했습니다.
-
-- **분산 시스템 프로그램 및 객체 지향 설계 학습**  
-  규모있는 프로그램을 체계적으로 설계하고 구현하는 능력을 키우고 싶었습니다.  
-  프로젝트 규모가 커짐에 따라, 객체 지향 설계(OOP)를 적용해 설계를 체계화해야 코드의 유지보수와 확장이 용이함을 깨달았습니다.
+[YouTube](https://www.youtube.com/watch?v=h-vbAZ6Hku4)
 
 ---
 
-## ⚙️ 패키지 기반 아키텍처, 데이터 플로우
+## 📖 Project Overview
+
+This project is a simple Ethereum-inspired blockchain client implemented **from scratch** in Go.  
+It runs entirely on a local environment and includes:
+
+<u>**P2P networking, transaction and block validation, propagation, storage, and execution.**</u>
+
+---
+
+## 📖 Project Goals
+
+- **Learn Go in depth**  
+  I wanted to explore Go’s features (goroutines, channels, etc.) by using them in a real project instead of toy examples.
+
+- **Deepen understanding of blockchain core concepts**  
+  By implementing core blockchain logic myself, I aimed to translate theory into concrete code and feel why each component is necessary.  
+  For example, I initially serialized data using JSON. Through this, I experienced vague typing and inefficient size, which helped me appreciate why encodings like RLP are more suitable and efficient in real blockchain systems.
+
+- **Improve skills in distributed systems and object-oriented design**  
+  As the project grew, I realized that maintaining and extending the codebase requires structured design.  
+  This led me to apply object-oriented design principles and modularize the system so the client remains maintainable and extensible as it scales.
+
+---
+
+## ⚙️ Package-Based Architecture & Data Flow
+
 ![image](https://github.com/user-attachments/assets/3c368d0d-a882-4c3a-a203-50349dedb728)
 
+### Core Packages
 
-### 주요 패키지 
-| 이름               | 설명                                                         |
-|--------------------|--------------------------------------------------------------|
-| **P2P**   | UDP, TCP 서버 실행 및 메시지 브로드캐스팅                     |
-| **Blockchain**      | 블록체인 코어. 트랜잭션, 블록을 처리하는 `Block Processor`, 주기적으로 블록 생성을 시도하는 `BlockCreator`, `Mempool`로 구성                       |
-| **Rpc-server**  | 외부와의 통신 제공                                           |
-| **Level DB**    | 블록, 계정 상태 저장                            |
+| Name           | Description                                                                                                        |
+| -------------- | ------------------------------------------------------------------------------------------------------------------ |
+| **P2P**        | Runs UDP/TCP servers and broadcasts messages to peers                                                              |
+| **Blockchain** | Blockchain core. Includes the `BlockProcessor` for handling txs/blocks, a periodic `BlockCreator`, and a `Mempool` |
+| **Rpc-server** | Exposes JSON-RPC endpoints for external communication                                                              |
+| **LevelDB**    | Persists blocks and account state                                                                                  |
 
-### 기타 패키지
-| 이름               | 설명                                                         |
-|--------------------|--------------------------------------------------------------|
-| **Account**   | 계정 검증, 생성, 저장, 업데이트                  |
-| **Mediator**      |  패키지 간 데이터 교환을 중재                    |
-| **Bootnode**  |     부트스트랩 노드                                      |
-| **Constants**    |   블록 생성 주기, 블록 당 트랜잭션 수 등 설정 값 관리                     |
-| **Utils**    | Keccak256 등 글로벌 유틸 함수                             |
-  
-네트워크 프로토콜인 `Node Discovery`, `P2P`는 [p2p/README.md](https://github.com/DreamBoysYJ/simple-blockchain-client/tree/main/p2p)를 확인해주세요! (cmd or ctl + click)   
+### Other Packages
+
+| Name          | Description                                                            |
+| ------------- | ---------------------------------------------------------------------- |
+| **Account**   | Validates, creates, stores, and updates accounts                       |
+| **Mediator**  | Mediates data exchange between packages                                |
+| **Bootnode**  | Bootstrap node for node discovery and peer sharing                     |
+| **Constants** | Manages configuration such as block interval, tx-per-block limit, etc. |
+| **Utils**     | Global utility functions (e.g. Keccak256)                              |
+
+Network protocols such as `Node Discovery` and `P2P` are described in more detail in  
+[p2p/README.md](https://github.com/DreamBoysYJ/simple-blockchain-client/tree/main/p2p) (Cmd/Ctrl + click).
 
 ---
 
+## 🛠 Usage Guide
 
-## 🛠 사용 가이드
+### Prerequisites
 
-### 사전 준비 사항
-아래 도구들을 사전에 설치하고 준비하셔야 합니다!:
+Please install and prepare the following tools before running the project:
 
 1. **Go**  
-   다운로드 및 설치: [Go 공식 사이트](https://go.dev/dl/)
+   Download & install: [Go official site](https://go.dev/dl/)
 
 2. **Postman Desktop Agent**  
-   준비: [Postman Desktop Agent 다운로드](https://www.postman.com/downloads/) (cmd or ctl + click)  
-   Postman을 통해 localhost에 요청을 보내려면 설치를 해야합니다.
+   Download: [Postman Desktop Agent](https://www.postman.com/downloads/)  
+   You’ll need the Desktop Agent to send HTTP requests to `localhost` from Postman.
 
-3. **Postman API Document**  
-   준비: [Postman API 문서](https://documenter.getpostman.com/view/25348775/2sAYQWLZZ9) (cmd or ctl + click)  
-   Postman을 통해 블록체인 노드에 트랜잭션 전송, 블록 조회 등이 가능합니다.
+3. **Postman API Documentation**  
+   Docs: [Postman API Docs](https://documenter.getpostman.com/view/25348775/2sAYQWLZZ9)  
+   You can use these to send transactions, query blocks, and interact with the node via Postman.
 
-4. **Notion API Document**  
-   준비: [Notion API 문서](https://ivory-gerbera-298.notion.site/Simple-Blockchain-client-v1-API-17c57a963d328091b9c1fbdc405345a0) (cmd or ctl + click)  
-   만약 Postman Docs가 무한 로딩이 여러 번 발생할 경우, Notion 페이지를 참고해주세요!
+4. **Notion API Documentation (Fallback)**  
+   Docs: [Notion API Docs](https://ivory-gerbera-298.notion.site/Simple-Blockchain-client-v1-API-17c57a963d328091b9c1fbdc405345a0)  
+   If the Postman docs get stuck on infinite loading multiple times, please refer to the Notion page instead.
 
-5. **방화벽 해제**  
-   준비: Windows 환경에서 프로그램 실행시 방화벽 문제로 실행이 안될 수 있습니다. 사전에 방화벽을 잠시 꺼주세요!  
+5. **Firewall (Windows)**  
+   On Windows, the program may fail to run due to firewall restrictions.  
+   Temporarily disable the firewall (or allow the app/ports) if you run into connectivity issues.
 
-6. **프로그램 에러시 재시작**  
-   준비: 예상치 못한 에러가 중간에 발생한다면, db 초기화를 위해 프로젝트에서 `db` 폴더를 삭제해주세요.  
-   혹은 부트스트랩 노드부터 풀노드 실행까지 순차대로 다시 시작해주세요, 감사합니다.
-   
----
-
-
-## 🚀 설치 및 실행
-
-1. 프로젝트를 클론한 후 프로젝트 디렉토리로 이동하세요:
-    ```bash
-    git clone https://github.com/DreamBoysYJ/simple-blockchain-client.git
-    cd simple-blockchain-client
-    ```
-
-2. **글로벌 명령어를 설정하세요 (옵션)**:  
-   프로젝트의 주요 명령어를 실행할 수 있도록 입력하세요.
-    ```bash
-    make all
-    ```
-   프로젝트를 빌드한 후, 실행파일을 `/usr/local/bin` 디렉토리에 설치하여 시스템 전역에서 사용할 수 있습니다.  
-   (글로벌 명령어를 실행했더라도, DB의 확실한 삭제를 확인하기 위해 `simple-blockchain-client` 디렉토리에서 명령어를 실행해주세요!)  
-
-4. **`bootnode(bootstrap node)`를 실행하세요**:
-    ```bash
-    go run . -nodeID=boot -mode=bootnode
-    
-    # 2번을 진행하셨다면:
-    
-    simple-blockchain-client -nodeID=boot -mode=bootnode
-    ```
-    bootnode는 UDP 서버로, 노드가 처음 실행될 때 연결하여 풀노드의 주소를 수집하기 위한 역할을 합니다.  
-    `Node Discovery`를 참고하여 간단한 프로토콜을 설계했고, bootnode와 통신한 모든 노드의 주소를 받습니다.
-
-5. **`Fullnode`를 서로 다른 터미널에서 최소 3개 이상 실행하세요**:
-    ```bash
-    go run . -nodeID=node1 -mode=fullnode -port=30301 -rpcport=8081
-    go run . -nodeID=node2 -mode=fullnode -port=30302 -rpcport=8082
-    go run . -nodeID=node3 -mode=fullnode -port=30303 -rpcport=8083
-    
-    ### 2번을 진행하셨다면:
-
-    simple-blockchain-client -nodeID=node1 -mode=fullnode -port=30301 -rpcport=8081
-    simple-blockchain-client -nodeID=node2 -mode=fullnode -port=30302 -rpcport=8082
-    simple-blockchain-client -nodeID=node3 -mode=fullnode -port=30303 -rpcport=8083
-    ```
-
-
+6. **Restarting on Errors**  
+   If you encounter unexpected errors during execution, try the following:
+   - Delete the `db` folder in the project to reset the database.
+   - Or restart from scratch: first run the bootstrap node, then start the full nodes again in order.
 
 ---
 
-### 플래그 설명
+## 🚀 Installation & Run
 
-| 플래그      | 설명                                                                                     | 기본값         |
-|-------------|------------------------------------------------------------------------------------------|----------------|
-| `port`      | `Node Discovery`를 위한 UDP 서버 포트이면서, P2P 통신을 위한 TCP 서버 포트               | 30303          |
-| `rpcport`   | 외부 브라우저나 DApp과 통신하기 위한 JSON-RPC 서버 포트                                  | 8080           |
-| `nodeID`    | 각 노드를 구분하기 위한 식별자. 데이터베이스 경로(`dbPath`) 설정에 사용되며, 로컬 테스트용 | `default`      |
-| `mode`      | 노드의 역할을 지정 (`bootnode` 또는 `fullnode`). 미입력 시 기본적으로 `fullnode`로 설정됨 | `fullnode`     |
+1. **Clone the project and move into the directory:**
+
+   ```bash
+   git clone https://github.com/DreamBoysYJ/simple-blockchain-client.git
+   cd simple-blockchain-client
+   ```
+
+2. **(Optional) Set up a global command:**:  
+    Run the following so you can execute the main commands globally:
+   `bash
+make all
+`
+   This builds the project and installs the binary into /usr/local/bin, so you can use it system-wide.
+   (Even if you set up the global command, it’s still recommended to run commands from the simple-blockchain-client directory when you want to be sure the DB is fully deleted and re-initialized.)
+
+3. **`bootnode(bootstrap node)` RUN**:
+
+   ```bash
+   go run . -nodeID=boot -mode=bootnode
+
+   # If you completed step 2:
+
+   simple-blockchain-client -nodeID=boot -mode=bootnode
+   ```
+
+   The bootnode runs a UDP server and is used to collect fullnode addresses when nodes start up and connect.
+   I designed a simple protocol inspired by Node Discovery, and the bootnode receives the addresses of all nodes that communicate with it.
+
+4. **Run at least 3 `Fullnodes` in different terminals:**:
+
+   ```bash
+   go run . -nodeID=node1 -mode=fullnode -port=30301 -rpcport=8081
+   go run . -nodeID=node2 -mode=fullnode -port=30302 -rpcport=8082
+   go run . -nodeID=node3 -mode=fullnode -port=30303 -rpcport=8083
+
+   ### If you completed step 2:
+
+   simple-blockchain-client -nodeID=node1 -mode=fullnode -port=30301 -rpcport=8081
+   simple-blockchain-client -nodeID=node2 -mode=fullnode -port=30302 -rpcport=8082
+   simple-blockchain-client -nodeID=node3 -mode=fullnode -port=30303 -rpcport=8083
+   ```
+
+---
+
+### Flag Description
+
+| Flag      | Description                                                                                               | Default    |
+| --------- | --------------------------------------------------------------------------------------------------------- | ---------- |
+| `port`    | UDP server port for `Node Discovery` and TCP server port for P2P communication                            | 30303      |
+| `rpcport` | JSON-RPC server port used to communicate with external tools (browser, DApp, Postman, etc.)               | 8080       |
+| `nodeID`  | Identifier used to distinguish each node. Also used to set the database path (`dbPath`) for local testing | `default`  |
+| `mode`    | Node role: `bootnode` or `fullnode`. If omitted, it defaults to fullnode                                  | `fullnode` |
 
 ![image](https://github.com/user-attachments/assets/5157266f-d262-4353-aa5c-ed9f64853e53)
-위와 같이 노드를 위한 계정 생성, 제네시스 블록 생성, 노드 연결을 통한 P2P 구축을 진행합니다.
+As shown above, the client:
+
+Creates accounts for each node,
+
+Creates the genesis block,
+
+Connects nodes together and builds the P2P network.
 
 ---
 
-### 5. Postman으로 트랜잭션 테스트하기
+### 5. Testing Transactions with Postman
 
-1. **상태 확인**: 우선 `getLastBlock`, `getBlockNumber`, `getAccountInfo`를 호출하여 현재 상태를 확인해주세요.
-2. **트랜잭션 생성**: tx1~tx10, `SendTransaction`을 호출하여 서명된 트랜잭션을 전송하세요.
-   - `SendRawTransaction`을 통해 `signature`를 미리 세팅해두었습니다.
-   - 메시지는 `from`, `to`, `value`, `nonce`를 붙인 값을 사용했습니다.
-   - `from`은 현재 해당 주소만 가능합니다. metamask 툴을 사용할 수 없기 때문에 해당 주소의 개인키는 하드코딩, value는 제네시스 블록 Miner로 이 주소를 세팅해 10000이 잔고로 있습니다.
-   - tx1에서 tx10까지 어떤 순서로 실행해도 괜찮습니다. 멤풀에서 계정 별로 논스를 기준으로 정렬하기 때문입니다.
-   - 그러나 현재는 주소 하나의 트랜잭션들만 멤풀에 담기기 떄문에, tx1~tx5까지 전송을 해야만 블록을 생성할 것입니다. (멤풀에서 주소마다 논스 순으로 Round Robin으로 트랜잭션을 추출해 블록을 생성합니다)
+1. **Check the current state**:  
+   First, call `getLastBlock`, `getBlockNumber`, and `getAccountInfo` to verify the current state.
 
+2. **Create transactions**:  
+   Use `tx1`–`tx10` and `SendTransaction` to send signed transactions.
+   - `SendRawTransaction` is preconfigured with the `signature`.
+   - The signed message is constructed by concatenating `from`, `to`, `value`, and `nonce`.
+   - Currently, only a specific `from` address is allowed. Since MetaMask or similar tools are not used, the private key for this address is hardcoded, and in the genesis block this address is set as the miner with an initial balance of `10000`.
+   - You can execute `tx1`–`tx10` in any order because the mempool sorts transactions by account and `nonce`.
+   - However, at the moment only transactions from a single address are stored in the mempool, so you must send at least `tx1`–`tx5` for a block to be created. (When building a block, the node pulls transactions from the mempool in round-robin order by address and nonce.)
 
 ![image](https://github.com/user-attachments/assets/02d3b079-d030-4886-8f23-867848fb830b)
-    위처럼 각 tx은 유효성 검증 후 피어에게 전파되나, 무한 전파를 막기 위해 이미 멤풀에 있는 중복 tx일 경우 drop합니다.
+As shown above, each transaction is validated and then propagated to peers.  
+ To prevent infinite propagation, any duplicate transaction that is already in the mempool is dropped.
 
+---
 
-### 6. 터미널로 블록 생성 확인하기
+### 6. Checking Block Creation in the Terminal
 
-1. **블록 생성**: 노드는 주기적으로 멤풀을 확인하며 일정 트랜잭션 갯수를 충족시 블록 생성을 시도하고 전파합니다.
-2. **블록 검증**: 블록을 수신한 노드는 이전 블록, 머클 트리, 블록 내 트랜잭션들을 검증합니다.
-3. **상태 변경**: 블록을 저장하고, 트랜잭션을 실행하고, 채굴자 주소에 1000을 추가합니다.
-4. **블록 전파**: 자신의 피어에게 블록을 전파합니다.
+1. **Block creation**:  
+   Each node periodically checks the mempool, and when a certain number of transactions is available, it attempts to create a block and broadcast it.
+
+2. **Block validation**:  
+   Nodes that receive a block verify the previous block reference, the Merkle tree, and all transactions inside the block.
+
+3. **State changes**:  
+   After validation, the node stores the block, executes the transactions, and adds `1000` as a block reward to the miner’s address.
+
+4. **Block propagation**:  
+   Finally, the node propagates the block to its peers.
 
 ![image](https://github.com/user-attachments/assets/6ed740de-9805-4b4c-839c-9bb2f8708163)
-위와 같이 검증 절차 후 블록을 저장하고 DB를 업데이트합니다.
-블록 검증을 완료 후, 블록 내 트랜잭션들이 본인 노드 멤풀에 있다면 삭제합니다.
-이를 통해 먼저 블록을 만들어 전파하면 같은 트랜잭션이 여러 블록에 포함되는 걸 방지할 수 있습니다.
+As shown above, after the validation process, the node stores the block and updates the DB.  
+If any of the block’s transactions are still present in the node’s own mempool, they are removed.  
+This prevents the same transaction from being included in multiple blocks when a node creates and broadcasts a block first.
 
+---
 
-### 7. Postman으로 업데이트된 State 확인하기
+### 7. Verifying the Updated State with Postman
 
-`getLastBlock`, `getBlockNumber`, `getAccountInfo`등을 호출하여 현재 상태를 확인해주세요.  
-블록 생성자 주소에는 보상금이, 제네시스 miner이자 트랜잭션 생성자인 from의 논스와 잔액이 변경되어 있을 것입니다!
+Call `getLastBlock`, `getBlockNumber`, and `getAccountInfo` again to check the updated state.  
+You should see that:
+
+- The block producer’s address has received the block reward.
+- The genesis miner, who is also the transaction sender (`from`), now has an updated `nonce` and balance.
+
 <img width="1040" alt="image" src="https://github.com/user-attachments/assets/eec76975-7f7a-412d-b4d1-6de7c6181acf" />
-
-
-
-
-   
